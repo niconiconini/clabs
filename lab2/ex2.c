@@ -1,5 +1,5 @@
 #include<stdio.h>
-int num1(int n){
+int num(int n){
 int count = 0;
 while(n){
   ++count;
@@ -7,13 +7,12 @@ while(n){
 }
 return count;
 }
-{
- int  n;
- int  count=0;
-int  'a','b','c','d','e';
-printf("please Input \n");
-n=('a'-48)*10000+('b'-48)*1000+('c'-48)*100+('d'-48)*10+('e'-48);
-   while(n!=EOF){putchar n};       
-     } 
-     return 0;
+int main(int argc, char const *argv[])
+{char b;
+  int a = 0;
+  while((b = getchar()) != '\n'){
+  a = a * 10 + b - '0';
+  }
+  printf("%d\n",num(a));
+  return 0;
 }
