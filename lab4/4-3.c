@@ -1,179 +1,123 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<ctype.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <math.h>
+
 #define MAXOP 100 
 #define NUMBER '0'
-int getop(char[]);
-void push(double);
-double pop(void);
-double atof(char s[]);
-int isspace(int);
-int isdigit(int);
-main()
-{
-    int type;
-    double op2, op3;
-    char s[MAXOP];
-
-    while ((type = getop(s)) != EOF)
-        switch (type)
-        {
-        case NUMBER:
-            push(atof(s));
-            break;
-        case '+':
-            push(pop() + pop());
-            break;
-        case '*':
-            push(pop() * pop());
-            break;
-        case '-':
-            op2 = pop();
-            push(pop() - op2);
-            break;
-        case '/':
-            op2 = pop();
-            if (op2 != 0.0)
-                push(pop() / op2);
-            else
-                printf("error: zero divisor\n");
-            break;
-        case '%':
-            op2 = pop();
-            op3 = pop();
-            if (op2 != (int)op2 || op3 != (int)op3)
-                printf("error: Only integers can get the modulus\n");
-            else if (op2 == 0)
-                printf("error: zero divisor\n");
-            else if (op2 < 0)
-                push(0);
-            else
-                push((int)op3 % (int)op2);
-            break;
-        case '=':
-            printf("\t%.8g\n", pop());
-            break;
-        case '.':
-            printf("error: There's no number in front of the decimal point");
-            break;
-        case ' ' : 
-        case '\n':
-        case '\t':
-            break;
-        default:
-            printf("error: unknown command %s\n", s);
-            break;
-        }
-}
-int getch(void);
-void ungetch(int);
-int getop(char s[])
-{
-    int i, c, c2;
-    while ((c = getch()) == ' ' || c == '\n' || c == '\t') ;
-    if (c == '-' || c == '+')
-        if (isdigit(c2 = getch()))
-        {
-            s[i++] = c;
-            c = c2;
-        }
-        else
-        {
-            ungetch(c2);
-            return c;
-        }
-    if (isdigit(c)) 
-    {
-        s[0] = c;
-        i = 1;
-        while (isdigit(c = getch()))
-            s[i++] = c;
-        if (c == '.')
-        {
-            s[i++] = c;
-            while (isdigit(c = getch()))
-                s[i++] = c;
-        }
-        s[i] = '\0';
-        if (c != '\n' && c!= ' ' && c != '\t')
-            ungetch(c);
-
-        return NUMBER;
-    }
-    else 
-        return c;
-}
+#define MAXVAL 100
 #define BUFSIZE 100
-char buf[BUFSIZE]; 
-int bufp = 0; 
-int getch(void)
-{
-    if (bufp > 0)
-        return buf[--bufp];
-    else
-        return getchar();
-}
-void ungetch(int c)
-{
-    if (bufp >= BUFSIZE)
-        printf("ungetch: too many characters\n");
-    else
-        buf[bufp++] = c;
-}
-#define MAXVAL 100 
-int op = 0;
+
+int sp = 0;
 double val[MAXVAL];
-void push(double d)
-{
-    if (op < MAXVAL)
-        val[op++] = d;
-    else
-        printf("error: stack full, can't push %g\n", d);
+char buf[BUFSIZ];
+int bufp = 0 ;
+
+int getop ( char s[] );
+void push (double f);
+double pop (void);
+int getch(void);
+void ungetch( int c);
+
+int main (){
+	int type;
+	double op2;
+    double op3;
+	char s[MAXOP];
+
+	while ( ( type = getop( s )) != EOF ){
+		switch (type)
+		{
+			case NUMBER:
+				push( atof (s) );
+				break;
+			
+			case '+':
+				push ( pop () + pop ());
+				break;
+
+			case '*':
+				push (pop() * pop() );
+				break;
+
+			case '-':
+				op2 = pop();
+				push ( pop() - op2);
+				break ;
+			
+			case '/':
+				op2 = pop();
+				if( op2 != 0)
+					push (pop() / op2 );
+				else printf("error : zero divisor\n");
+				break;
+			
+			case '%':
+				op2 = pop();
+				op3=pop();
+				if( (int)op2 == op2&&(int)op3==op3&&op2!=0)
+					push ((int)op3%(int)op2);
+				else printf("error : zero divisor\n");
+				break;
+			
+			case '\n':
+				printf("result = %.8g\n",pop());
+				break;
+			default:
+				printf("unknown commond %s\n",s);
+				break;
+		}
+	}
+	return 0;
 }
-double pop(void)
-{
-    if (op > 0)
-        return val[--op];
-    else
-        printf("error: stack empty\n");
-    return 0.0;
+
+void push (double f){
+	if ( f < MAXVAL)
+		val[sp++] = f;
+	else printf("error : stack full,can not push %g\n",f);
 }
-double atof(char s[])
-{
-    double power, val;
-    int sign, i, sign2, j, n;
-    for (i = 0; isspace(s[i]); i++) ;
-    sign = (s[i] == '-') ? -1 : 1;
-    if (s[i] == '-' || s[i] == '+')
-        i++;
-    for (val = 0.0; isdigit(s[i]); i++)
-        val = val * 10 + (s[i] - '0');
-    if (s[i] == '.')
-        i++;
-    for (power = 1.0; isdigit(s[i]); i++)
-    {
-        val = val * 10 + (s[i] - '0');
-        power *= 10;
-    }
-    if (s[i] == 'e' || s[i] == 'E')
-    {
-        i++;
-        sign2 = (s[i] == '-') ? 1 : 0;
-        if (s[i] == '-' || s[i] == '+')
-            i++;
-        for (n = 0; isdigit(s[i]); i++)
-            n = n * 10 + (s[i] - '0');
-        for (j = 0; j < n; j++)
-            power = (sign2) ? (power * 10) : (power / 10);
-    }
-    return val * sign / power;
+
+double pop (void){
+	if ( sp > 0)
+		return val[--sp];
+	else printf("error : stack empty!\n");
+	return 0;
 }
-int isspace(int x)
-{
-    return (x == ' ' || x == '\t' || x == '\n') ? 1 : 0;
+int getop (char s[] ){
+	int i,c;
+	while ( (s[0] = c = getch()) == ' ' || c == '\t' ) 
+	 ;
+	s[1] = '\0';
+	if ( !isdigit(c) && c != '.' && c != '-') 
+		return c;
+	i = 0;
+	if ( c == '-' ){
+		if ( isdigit(s[++i] = c = getch() ) || c == '.')
+			s[i] = c;
+		else {
+			if ( c != EOF )
+				ungetch(c);
+		return '-';
+		}
+	}	
+	if ( isdigit(s[i]) ) 
+		while ( isdigit(s[++i] = c = getch()) )
+		;
+	if ( c == '.' )
+		while ( isdigit(s[++i] = c = getch()) )
+		;
+	s[i] = '\0';
+	if ( c != EOF ) 
+		ungetch( c );
+	return NUMBER;
 }
-int isdigit(int x)
-{
-    return (x >= '0' && x <= '9') ? 1 : 0;
+
+int getch(void){
+	return (bufp > 0) ? buf[--bufp] : getchar() ;
+}
+
+void ungetch( int c){
+	if ( bufp >= BUFSIZ)
+		printf("ungetch : too many characters!\n");
+	else buf[bufp++] = c ;
 }
