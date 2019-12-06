@@ -1,274 +1,131 @@
-#include <stdio.h>
-#define MAXOP 100 
-#define NUMBER '0' 
+#include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+#define MAXOP 100
+#define NUMBER '0'
 int getop(char[]);
-void push(double d);
+void push(double);
 double pop(void);
-void printtop(void);
-double copy(void);
-double peek(void);
-int swop();
-int clear();
-double atof(char s[]);
-int isspace(int);
-int isdigit(int);
-main()
-{
+main(){
     int type;
-    double op2, op3;
+    double op1;
+    double op2;
     char s[MAXOP];
-
-    while ((type = getop(s)) != EOF)
-        switch (type)
-        {
-        case NUMBER:
+    while((type = getop(s))!=EOF){
+        switch (type){
+            case NUMBER:
             push(atof(s));
             break;
-        case '+':
-            push(pop() + pop());
+            case'+':
+            push(pop()+pop());
             break;
-        case '*':
-            push(pop() * pop());
+            case'*':
+            push(pop()*pop());
             break;
-        case '-':
+            case'-':
+            op2=pop();
+            push(pop()-op2);
+            break;
+            case '%':
+            op1 = pop();
             op2 = pop();
-            push(pop() - op2);
-            break;
-        case '/':
-            op2 = pop();
-            if (op2 != 0.0)
-                push(pop() / op2);
-            else
-                printf("error: zero divisor\n");
-            break;
-        case '%':
-            op2 = pop();
-            op3 = pop();
-            if (op2 != (int)op2 || op3 != (int)op3)
-                printf("error: Only integers can get the modulus\n");
-            else if (op2 == 0)
+            if (op1 != (int)op1 || op2 != (int)op2)
+                printf("error\n");
+            else if (op1 == 0)
                 printf("error: zero divisor\n");
             else if (op2 < 0)
-                push(0);
+            push((int)op2 % (int)op1);
+            else if (op1 < 0)
+            push((int)op2 % (int)op1);
             else
-                push((int)op3 % (int)op2);
+                push((int)op2 % (int)op1);
             break;
-        case '=': 
-            printf("\t%.8g\n", pop());
-            break;
-        case '.':
-            printf("error: There's no number in front of the decimal point");
-            break;
-        case 'c':
-        case 'C':
-            op2 = copy();
-            if (op2 != 0)
-                printf("%g to be copied\n", op2);
-            break;
-        case 'e':
-        case 'E':
-            op2 = clear();
-            if (op2 != 0)
-                printf("The %d elements were deleted\n", (int)op2);
-            break;
-        case 'p':
-        case 'P':
-            printtop();
-            break;
-        case 's':
-        case 'S':
-            swop();
-            break;
-        case 'b':
-        case 'B':
+            case'p':
             op2 = pop();
-            printf("%g deleted\n", op2);
+            printf("\t%.8g\n",op2);
+            push(op2);
             break;
-        case ' ': 
-        case '\n':
-        case '\t':
+            case'c':
+            op2 = pop();
+            push(op2);
+            push(op2);
             break;
-        default:
-            printf("error: unknown command %s\n", s);
             break;
+            case's':
+            op1=pop();
+            op2=pop();
+            push(op1);
+            push(op2);
+            break;
+            case'/':
+            op2 = pop();
+            if(op2 !=0.0)
+            push(pop()/op2);
+            else
+            printf("error:zero divisor\n");
+            break;
+            case'\n':
+            printf("\t%.8g\n",pop()); 
+            break;
+            default:
+            printf("error:unknown command %s\n",s);
+            break;   
         }
+    }
+    return 0;
 }
-int getch(void);
-void ungetch(int);
-int getop(char s[])
-{
-    int i, c, c2;
-    while ((c = getch()) == ' ' || c == '\n' || c == '\t') 
-        ;
-    if (c == '-' || c == '+') 
-        if (isdigit(c2 = getch()))
-        {
-            s[i++] = c;
-            c = c2;
-        }
-        else
-        {
-            ungetch(c2);
-            return c;
-        }
-    if (isdigit(c))
+#define MAXVAL 100
+int sp = 0;
+double val[MAXVAL];
+void push(double f){
+    if (sp<MAXVAL)
+    val[sp++] = f;
+    else
     {
-        s[0] = c;
-        i = 1;
-        while (isdigit(c = getch()))
-            s[i++] = c;
-        if (c == '.')
-        {
-            s[i++] = c;
-            while (isdigit(c = getch()))
-                s[i++] = c;
+        printf("error:stack full,can't push %g\n",f);
+    }
+}
+    double pop(void){
+        if (sp>0)
+        return val[--sp];
+        else{
+            printf("error:stack empty\n");
+            return 0.0;
         }
-        s[i] = '\0';
-        if (c != '\n' && c != ' ' && c != '\t')
-            ungetch(c);
-
+    }
+    int getch(void);
+    void ungetch(int);
+    int getop(char s[]){
+        int i,c;
+        while((s[0]=c=getch())==' '||c=='\t')
+        ;
+        s[1] = '\0';
+        if(!isdigit(c)&&c!='.')
+        return c;
+        i = 0;
+        if(isdigit(c))
+        while(isdigit(s[++i]=c=getch()))
+        ;
+        if(c=='.')
+        while(isdigit(s[++i]=c=getch()))
+        ;
+        s[i]='\0';
+        if(c!=EOF)
+        ungetch(c);
         return NUMBER;
     }
-    else
-        return c;
-}
-#define BUFSIZE 100
-char buf[BUFSIZE]; 
-int bufp = 0; 
-int getch(void)
-{
-    if (bufp > 0)
-        return buf[--bufp];
-    else
-        return getchar();
-}
-void ungetch(int c)
-{
-    if (bufp >= BUFSIZE)
-        printf("ungetch: too many characters\n");
-    else
-        buf[bufp++] = c;
-}
-#define MAXVAL 100 
-int op = 0;
-double val[MAXVAL];
-void push(double d)
-{
-    if (op < MAXVAL)
-        val[op++] = d;
-    else
-        printf("error: stack full, can't push %g\n", d);
-}
-double pop(void)
-{
-    if (op > 0)
-        return val[--op];
-    else
-        printf("error: stack empty\n");
-    return 0.0;
-}
-void printtop(void)
-{
-    if (op > 0)
-        printf("%g\n", val[op - 1]);
-    else 
-        printf("error: stack empty\n");
-}
-double copy(void)
-{   
-    double n;
-    if (op > 0)
-    {
-        push(n = val[op - 1]);
-        return n;
+    #define BUFSIZE 100
+    char buf[BUFSIZE];
+    int bufp = 0;
+    int getch(void){
+        return(bufp>0)?buf[--bufp]:getchar();
     }
-    else
-    {
-        printf("error: stack empty\n");
-        return 0.0;
+    void ungetch(int c){
+        if(bufp>=BUFSIZE)
+        printf("ungetch:too many characters\n");
+        else
+        {
+            buf[bufp++]=c;
+        }
+        
     }
-}
-double peek(void)
-{
-    if (op > 0)
-        return val[op - 1];
-    else
-        printf("error: stack empty\n");
-    return 0.0;
-}
-int swop()
-{
-    double t;
-    if (op > 1)
-    {
-        t = val[op - 1];
-        val[op - 1] = val[op - 2];
-        val[op - 2] = t;
-        return 1;
-    }
-    else
-    {
-        printf("The number of elements in the stack is insufficient\n");
-        return 0;
-    }
-}
-int clear()
-{
-    int n;
-    if (op > 0)
-    {
-        n = op;
-        op = 0;
-        return n;
-    }
-    else
-    {
-        printf("error: stack empty\n");
-        return 0;
-    }
-}
-double atof(char s[])
-{
-    double power, val;
-    int sign, i, sign2, j, n;
-    for (i = 0; isspace(s[i]); i++)
-        ;
-
-    sign = (s[i] == '-') ? -1 : 1;
-
-    if (s[i] == '-' || s[i] == '+')
-        i++;
-    for (val = 0.0; isdigit(s[i]); i++)
-        val = val * 10 + (s[i] - '0');
-    if (s[i] == '.')
-        i++;
-    for (power = 1.0; isdigit(s[i]); i++)
-    {
-        val = val * 10 + (s[i] - '0');
-        power *= 10;
-    }
-
-    if (s[i] == 'e' || s[i] == 'E')
-    {
-        i++;
-        sign2 = (s[i] == '-') ? 1 : 0;
-        if (s[i] == '-' || s[i] == '+')
-            i++;
-
-        for (n = 0; isdigit(s[i]); i++)
-            n = n * 10 + (s[i] - '0');
-
-        for (j = 0; j < n; j++)
-            power = (sign2) ? (power * 10) : (power / 10);
-
-    }
-    return val * sign / power;
-}
-int isspace(int x)
-{
-    return (x == ' ' || x == '\t' || x == '\n') ? 1 : 0;
-}
-int isdigit(int x)
-{
-    return (x >= '0' && x <= '9') ? 1 : 0;
-}
