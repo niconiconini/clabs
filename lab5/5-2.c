@@ -29,8 +29,10 @@ int getfloat(float *pn)
 	return c;	
 }
 int main()
-{char a,b,sum;
- scanf("%s %s", a,b);
+{int a,b,sum;
+ scanf("%e %e", a,b);
+ a==getfloat(*a);
+ b==getfloat(*b);
  sum=getfloat(a)+getfloat(b);
 printf('%d',sum);
 return 0;
