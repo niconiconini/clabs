@@ -18,7 +18,6 @@ return k;
 int main()
 {
 char s[200],t[200];
-gets(s);
-gets(t);
+scanf("%s %s", s,t);
 printf( "%d\n",strrindex(s,t));
 } 
