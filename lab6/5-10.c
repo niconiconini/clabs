@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
-
-
+#include<ctype.h>
+#include<stdlib.h>
 #define MAXOP 100
 #define NUMBER '0'
 

@@ -10,7 +10,7 @@ if(a[i]!=b[j]) break;
 i++;
 n++;
 }
-if(b[j]=='\0') k=i-n;
+if(b[j]=='\0') k=i-n+1;
 }
 return k;
 }
