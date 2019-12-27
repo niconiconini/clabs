@@ -127,5 +127,4 @@ void push(double f){
         {
             buf[bufp++]=c;
         }
-        
     }

@@ -17,6 +17,6 @@ int main(int argc,char *argv[])
         a[i+1]=min;
     }
     }
-    printf("The min number is%f \n",a[argc-2]);
+    printf("The min number is%f \n",a[x]);
     return 0;
 }

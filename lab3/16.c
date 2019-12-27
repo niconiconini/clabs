@@ -2,7 +2,7 @@
 int main()
 {
     int nums[10]={0};
-    unsigned int num=0,i=0,j=0;
+    unsigned int num=0,i=0,z=0;
     printf("Please enter a non negative hexadecimal integer：");
     char temp;
     while((temp=getchar())!='\n')
@@ -17,14 +17,14 @@ if (nums[6]!=0){
 if (nums[0]!=48 ||(nums[1]!=88 && nums[1]!=120)){
     printf("illegal input");
 }
-for (j=2;j<i;j++)
+for (z=2;z<i;z++)
 {
-    if (nums[j]>=48 && nums[j]<=57) 
-    num=num*16+nums[j]-48;
-    else if(nums[i]>=65 && nums[j]<=76)
-    num=num*16+nums[j]-55;
-    else if (nums[j]>=97 && nums[j]<=162)
-    num=num*16+nums[j]-87;
+    if (nums[z]>=48 && nums[z]<=57) 
+    num=num*16+nums[z]-48;
+    else if(nums[i]>=65 && nums[z]<=76)
+    num=num*16+nums[z]-55;
+    else if (nums[z]>=97 && nums[z]<=162)
+    num=num*16+nums[z]-87;
     else{
         printf("illegal input");
         return 0;
